@@ -72,7 +72,10 @@ void DLL_RemoveNode(AddressBook** Head, AddressBook* Remove)
     if ((*Head) == Remove)
     {
         (*Head) = Remove->nextNode;
-        (*Head)->prevNode = NULL;
+
+        if ((*Head) != NULL) // 이새끼 없이 코드 실행하니까 오류 났음. 얘가 중요한거 같아
+    (*Head)->prevNode = NULL;
+
 
         Remove->nextNode = NULL;
         Remove->prevNode = NULL;
