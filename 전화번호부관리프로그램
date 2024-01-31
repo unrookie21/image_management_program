@@ -1,0 +1,260 @@
+#define _CRT_SECURE_NO_WARNINGS
+
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
+
+
+
+
+typedef struct tagNode {
+
+
+    char name[10];
+    char phone[20];
+    struct tagNode* prevNode;
+    struct tagNode* nextNode;
+
+
+}AddressBook;
+
+
+int Count = 0;
+
+// 노드 생성 연산
+
+AddressBook* AddressCreate(char* name, char* phone)
+{
+    AddressBook* NewNode = (AddressBook*)malloc(sizeof(AddressBook));
+
+    strcpy(NewNode->name, name);
+    strcpy(NewNode->phone, phone);
+
+    NewNode->prevNode = NULL;
+    NewNode->nextNode = NULL;
+
+    return NewNode;
+}
+
+
+void AppendBook(AddressBook** Head, AddressBook* NewBook)
+{
+    if ((*Head) == NULL) // 전화번호부가 비어있는경우
+    {
+        (*Head) = NewBook;
+
+
+    }
+
+
+    else // 전화번호부가 비어 있지 않은 경우
+    {
+        AddressBook* Tail = (*Head);
+
+        while (Tail->nextNode != NULL)
+        {
+            Tail = Tail->nextNode;
+
+        }
+
+        Tail->nextNode = NewBook;
+        NewBook->prevNode = Tail;
+    }
+
+
+
+
+}
+
+void DLL_RemoveNode(AddressBook** Head, AddressBook* Remove)
+{
+
+    if ((*Head) == Remove)
+    {
+        (*Head) = Remove->nextNode;
+        (*Head)->prevNode = NULL;
+
+        Remove->nextNode = NULL;
+        Remove->prevNode = NULL;
+
+
+
+    }
+
+    else
+    {
+        AddressBook* Temp = Remove;
+        if (Remove->prevNode != NULL)
+        {
+            Remove->prevNode->nextNode = NULL;
+
+        }
+
+        if (Remove->nextNode != NULL)
+        {
+            Remove->nextNode->prevNode = NULL;
+
+        }
+
+        Remove->prevNode = NULL;
+        Remove->nextNode = NULL;
+
+
+    }
+
+
+}
+
+
+
+
+
+AddressBook* get_Info(void)
+{
+    printf("이름을 입력하세요 : ");
+    char name_buffer[10];
+
+    fgets(name_buffer, sizeof(name_buffer), stdin);
+    if (name_buffer[strlen(name_buffer) - 1] == '\n')
+        name_buffer[strlen(name_buffer) - 1] = 0;
+
+
+    printf("전화번호를 입력하세요 : ");
+    char phone_buffer[20];
+
+    fgets(phone_buffer, sizeof(phone_buffer), stdin);
+    if (phone_buffer[strlen(phone_buffer) - 1] == '\n')
+        phone_buffer[strlen(phone_buffer) - 1] = 0;
+
+
+    AddressBook* Newbook;
+
+    Newbook = AddressCreate(name_buffer, phone_buffer);
+
+    return Newbook;
+
+}
+
+AddressBook* GetNodeAt(AddressBook* Head, int Location)
+{
+    AddressBook* Current = Head;
+
+    while (Current != NULL && (--Location) >= 0)
+    {
+        Current = Current->nextNode;
+
+    }
+
+    return Current;
+
+}
+
+void show_Info(AddressBook* List)
+{
+
+    if (List == NULL)
+    {
+        printf("전화번호부가 비어 있습니다. \n");
+    }
+
+    else
+    {
+        AddressBook* Current = List;
+
+        while (Current != NULL && Current->nextNode != NULL)
+        {
+            printf("이름 : %s | 전화번호 : %s \n", Current->name, Current->phone);
+            Current = Current->nextNode;
+        }
+
+    }
+
+}
+
+void freeAllNodes(AddressBook* head)
+{
+    AddressBook* current = head;
+    AddressBook* next;
+
+    while (current != NULL)
+    {
+        next = current->nextNode; // 다음 노드를 저장
+        free(current); // 현재 노드 해제
+        current = next; // 다음 노드로 이동
+    }
+}
+
+
+
+
+int main(void)
+{
+
+    AddressBook* AddressList = NULL;
+    AddressBook* NewBook = NULL;
+
+    printf("        전화번호부 관리 프로그램 ver 1.0.0\n");
+    printf("------------------------------------------------\n");
+
+
+
+
+
+    while (1)
+    {
+        printf("1.전화번호부 목록   2. 전화번호 추가    3. 전화번호 삭제  4. 프로그램종료\n");
+
+        int menu;
+        scanf("%d", &menu);
+
+        while (getchar() != '\n') // 입력 버퍼 비우기
+            continue;
+
+        AddressBook* Remove = NULL;
+
+        if (menu == 1)
+        {
+            // 전화번호부 목록 보여주는 함수 호출
+            show_Info(AddressList);
+
+        }
+
+        if (menu == 2)
+        {
+            NewBook = get_Info(); // 사용자로부터 이름과 주소 입력받기
+            AppendBook(&AddressList, NewBook);
+
+        }
+
+        if (menu == 3)
+        {
+            // 전화번호 삭제하는 함수 호출 
+            printf("몇번 노드를 삭제할지 말해주세요 : ");
+            int Location;
+            scanf("%d", &Location);
+
+            Remove = GetNodeAt(AddressList, Location);
+            DLL_RemoveNode(&AddressList, Remove);
+
+        }
+
+        if (menu == 4)
+        {
+            // 프로그램 종료
+            break;
+        }
+
+    }
+
+
+
+    // 메모리해제
+
+
+    freeAllNodes(AddressList);
+    free(AddressList);
+
+
+
+    return 0;
+}
