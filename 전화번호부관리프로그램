@@ -164,7 +164,7 @@ void show_Info(AddressBook* List)
     {
         AddressBook* Current = List;
 
-        while (Current != NULL && Current->nextNode != NULL)
+        while (Current != NULL)
         {
             printf("이름 : %s | 전화번호 : %s \n", Current->name, Current->phone);
             Current = Current->nextNode;
